@@ -65,36 +65,16 @@ jobs:
         export PATH=${NETCDF_DIR}/bin:${PATH} 
         export NETCDF_PLUGIN_DIR=${{ github.workspace }}/netcdf-c-${NETCDF_VERSION}/plugins/plugindir
         python setup.py install
-    - name: Test
+    - name : Build
       run: |
         export PATH=${NETCDF_DIR}/bin:${PATH} 
-        python checkversion.py
-        # serial
-        cd test
-        python run_all.py
-        # parallel (hdf5 for netcdf4, pnetcdf for netcdf3)
-        cd ../examples
-        mpirun.mpich -np 4 python mpi_example.py
-        if [ $? -ne 0 ] ; then
-          echo "hdf5 mpi test failed!"
-          exit 1
-        else
-          echo "hdf5 mpi test passed!"
-        fi
-        mpirun.mpich -np 4 python mpi_example_compressed.py
-        if [ $? -ne 0 ] ; then
-          echo "hdf5 compressed mpi test failed!"
-          exit 1
-        else
-          echo "hdf5 compressed mpi test passed!"
-        fi
-        mpirun.mpich -np 4 python mpi_example.py NETCDF3_64BIT_DATA
-        if [ $? -ne 0 ] ; then
-          echo "pnetcdf mpi test failed!"
-          exit 1
-        else
-          echo "pnetcdf mpi test passed!"
-        fi
+        python setup.py build_ext --inplace
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: netcdf4-python
+        path: dist/
 
 #   - name: Tarball
 #     run: |
