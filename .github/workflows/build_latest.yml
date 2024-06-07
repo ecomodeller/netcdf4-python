@@ -13,7 +13,7 @@ jobs:
       #NO_NET: 1
     strategy:
       matrix:
-        python-version: ["3.11"]
+        python-version: ["3.12"]
     steps:
 
     - uses: actions/checkout@v4
@@ -65,10 +65,11 @@ jobs:
         export PATH=${NETCDF_DIR}/bin:${PATH} 
         export NETCDF_PLUGIN_DIR=${{ github.workspace }}/netcdf-c-${NETCDF_VERSION}/plugins/plugindir
         python setup.py install
-    - name : Build
+    - name : Build wheel
       run: |
         export PATH=${NETCDF_DIR}/bin:${PATH} 
-        python setup.py build_ext --inplace
+        python setup.py
+        pip wheel . -w dist --no-deps
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v2
